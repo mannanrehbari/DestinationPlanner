@@ -1,0 +1,25 @@
+{% extends "base.html"%}
+{% block title %} Index {% endblock %}
+{% block head %}
+{{ super() }}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <h1> You are about to delete this destination</h1>
+  <div class="jumbotron">
+    <h1> <strong>{{dest.name}} </strong> </h1>
+
+    <form class="form-inline" , method='post'>
+      <button class="btn btn-danger" type="submit"> Remove </button>
+      <a href="{{url_for('viewdestination', countryid=country.id, destid=dest.id)}}" class="btn btn-primary" role="button"> Cancel </a>
+    </form>
+
+
+  </div>
+
+</div>
+
+{% endblock %}

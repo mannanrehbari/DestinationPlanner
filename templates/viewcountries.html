@@ -1,0 +1,36 @@
+{% extends "base.html"%}
+{% block title %} Index {% endblock %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <!-- gets the flashed message to create a dismissible alert-->
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+  {% endwith %}
+
+  <h3> Your country list: </h3>
+  <hr>
+  {% if countries != [] %}
+  {% for country in countries %}
+
+  <a class="btn btn-info" href="{{url_for('viewcountry', countryid=country.id)}}" role="button"> {{country.name }} </a>
+
+  {% endfor %}
+  {% else %}
+  <h3> Add a few countries</h3>
+  {% endif %}
+
+</div>
+
+{% endblock %}

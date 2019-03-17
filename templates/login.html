@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> Destination Planner</title>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <style>
+    input:read-only { text-color: white; }
+    body,
+    html {
+      height: 100%;
+      margin: 0;
+    }
+    .bg {
+      /* The image used */
+      background-image: url({{ url_for('static', filename='img/bg.jpg') }});
+
+    /* Full height */
+    height: 100%;
+
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: after ;
+    background-size: cover;
+    }
+
+    .item {
+      width: 100%;
+      max-height: 500px !important;
+    }
+
+    div.carousel {
+      box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.2);
+    }
+    #map{
+      box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    h3,h4,h1,h2 {
+      color: white;
+    }
+
+    #carouselDescription {
+      background-color: rgba(0, 0, 0, 0.5);
+
+    }
+
+    #topheader .navbar-nav li>a {
+      text-transform: capitalize;
+      color: #333;
+      transition: background-color .2s, color .2s;
+
+      &:hover,
+      &:focus {
+        background-color: #333;
+        color: #fff;
+      }
+    }
+
+    #topheader .navbar-nav li.active>a {
+      background-color: #333;
+      color: #fff;
+    }
+    #map {
+        width: 100%;
+        height: 400px;
+        background-color: grey;
+      }
+
+  </style>
+
+
+
+</head>
+
+<body>
+  <div class="bg">
+
+
+    <nav class="navbar navbar-inverse">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{{ url_for('index')}}">Destination Planner</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="{{ url_for('index')}}"> <span class="glyphicon glyphicon-home"></span> Home</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div id="content">
+
+      {% block content %}
+      <div class="container" >
+        <a class="btn btn-block btn-social btn-google" style="background-color:#DD4B39; color:white;" href="{{ url_for('callauthorize')}}">
+       <span class="fa fa-google"></span> Sign in with Google
+       </a>
+
+      </div>
+
+
+      {% endblock %}
+    </div>
+
+  </div>
+
+  {% block content2 %} {% endblock%}
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  <!-- To make request for validated address-->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+
+  </script>
+
+</body>
+
+
+</html>

@@ -1,0 +1,215 @@
+{% extends "base.html"%}
+{% block title %} Index {% endblock %}
+{% block head %}
+{{ super() }}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <!-- There wont be any flashed messages here -->
+
+  <div class="alert alert-success " id="successalert" hidden>
+      <p id="successText"> <p>
+  </div>
+
+  <h3> Add new destination in {{country.name}} </h3>
+  <a href="{{url_for('viewcountry', countryid=country.id)}}" class="btn btn-primary" role="button"> back to {{country.name}} destinations</a>
+
+  <hr>
+</div>
+
+
+
+<div class="container" id="validsubmit">
+    <input type="text" id="location-input" class="form-control form-control-lg" onchange="inputChange()">
+    <br>
+    <button id="validatebtn" type="button" class="btn btn-info btn-block">Validate</button>
+
+  <div class="alert alert-info" id="alertforvalidation">
+    Enter an address to validate!
+  </div>
+  <hr>
+  <form  action="/destinationadded"  method="post" role="form">
+    <div class="card-block" id="formatted-address"></div>
+    <div class="card-block" id="geometry"></div>
+    <button id="submitbtn" type="submit" class="btn btn-primary btn-block" disabled > Submit </button>
+  </form>
+
+
+</div>
+
+<script>
+  // json for adding latlng to database
+  var latlngjson = {};
+  var country_idd = {{country.id}};
+
+  // prevent Enter key
+  document.getElementById("location-input").onkeypress = function(e) {
+  var key = e.charCode || e.keyCode || 0;
+  if (key == 13) {
+    e.preventDefault();
+  }
+}
+
+  // the entered address is valid
+  var validinput = false;
+
+  // Call Geocode
+  //geocode();
+
+  //handles events for both submit buttons!
+  //first one: create a
+  var validsubmitParent = document.querySelector("#validsubmit");
+  validsubmitParent.addEventListener("click", doSomething, false);
+  function doSomething(e) {
+
+    e.preventDefault();
+    if (e.target !== e.currentTarget) {
+      var clickedItem = e.target.id;
+
+      if(clickedItem == 'validatebtn'){
+        geocode(e);
+      } else if(clickedItem == 'submitbtn'){
+        $.ajax({
+            url: '/destinationadded',
+            data: latlngjson,
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(response) {
+                console.log(response);
+                var successAlert = document.getElementById('successalert');
+                successAlert.style.display = 'block';
+
+                document.getElementById('successText').innerHTML=response;
+                inputChange();
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+
+      }
+
+
+
+    }
+
+    e.stopPropagation();
+  }
+
+  // clear data after change in input
+  function inputChange(){
+    document.getElementById('formatted-address').innerHTML ='';
+    document.getElementById('geometry').innerHTML='';
+    $('#submitbtn').attr('disabled','true');
+    validinput=false;
+  }
+
+
+
+
+  // Listen for validate
+  //locationForm.addEventListener('submit', geocode);
+  // var validalert = document.getElementById('alertforvalidation');
+
+
+  function geocode(e) {
+    // Prevent actual submit
+    e.preventDefault();
+
+    var location = document.getElementById('location-input').value;
+    if (location == "") {
+      document.getElementById('alertforvalidation').innerHTML = "The address cannot be blank!";
+      inputChange();
+
+      return;
+    }
+
+
+    axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+        params: {
+          address: location,
+          key: 'AIzaSyDIJaj7bbDWpnlzaATnmuupdqyR_l5WhVw'
+        }
+      })
+      .then(function(response) {
+        // response object is returned by axios
+        if (response.data.status == "ZERO_RESULTS") {
+          document.getElementById('alertforvalidation').innerHTML = 'The address is invalid';
+          inputChange();
+          return;
+        }
+
+        // Formatted Address
+        var formattedAddress = response.data.results[0].formatted_address;
+
+
+
+
+        var formattedAddressOutput = `
+          <ul class="list-group">
+            <li class="list-group-item">${formattedAddress}</li>
+          </ul>
+        `;
+
+        var ourCountry = {{ country.name|tojson|safe }};
+        var validatedCountry ='';
+
+        // Address Components
+        var addressComponents = response.data.results[0].address_components;
+
+        var addressComponentsOutput = '<ul class="list-group">';
+        for (var i = 0; i < addressComponents.length; i++) {
+          if (addressComponents[i].long_name == ourCountry) {
+            validatedCountry=addressComponents[i].long_name;
+            if (addressComponents.length > 1) {
+              document.getElementById('alertforvalidation').innerHTML = 'This is a valid destination, Proceed by clicking Submit!';
+
+              $('#submitbtn').removeAttr('disabled');
+              //addressComponentsOutput += `
+              //  <li class="list-group-item"><strong>${addressComponents[i].types[0]}</strong>: ${addressComponents[i].long_name}</li>
+              //`;
+              validinput=true;
+            } else {
+              document.getElementById('alertforvalidation').innerHTML = 'Enter a more specific address';
+              inputChange();
+
+            }
+          } else {
+            document.getElementById('alertforvalidation').innerHTML = 'Enter an address in ' + ourCountry;
+            inputChange();
+
+          }
+        }
+        addressComponentsOutput += '</ul>';
+        // entered a valid address so display coordinates and other info
+        if(validinput){
+          // Geometry
+          var lat = response.data.results[0].geometry.location.lat;
+          var lng = response.data.results[0].geometry.location.lng;
+          latlngjson = {lat: lat, lng: lng, countryid: country_idd, address:formattedAddress};
+          var geometryOutput = `
+            <ul class="list-group">
+              <li class="list-group-item"><strong>Latitude</strong>: ${lat}</li>
+              <li class="list-group-item"><strong>Longitude</strong>: ${lng}</li>
+            </ul>
+          `;
+
+          // Output to app
+          document.getElementById('formatted-address').innerHTML = formattedAddressOutput;
+          //document.getElementById('address-components').innerHTML = addressComponentsOutput;
+          document.getElementById('geometry').innerHTML = geometryOutput;
+        }
+
+
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
+  }
+</script>
+
+
+{% endblock %}

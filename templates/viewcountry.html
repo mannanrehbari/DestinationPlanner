@@ -1,0 +1,71 @@
+{% extends "base.html"%}
+{% block title %} Index {% endblock %}
+{% block head %}
+{{ super() }}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+  <!-- gets the flashed message to create a dismissible alert-->
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+  {% endwith %}
+
+  <div class="btn-group btn-group-justified">
+    <a href="{{url_for('adddestination', countryid=country.id)}}" class="btn btn-primary">Add a destination in {{country.name}} </a>
+    <a href="{{url_for('deletecountry', countryid=country.id)}}" class="btn btn-warning">Remove country</a>
+  </div>
+  <hr>
+
+  {% if destinations != [] %}
+  <h3> Existing destinations in {{country.name}} </h3>
+  {% for dest in destinations %}
+
+  <a class="btn btn-info" role="button" href="{{url_for('viewdestination', countryid=country.id, destid=dest.id)}}"> {{dest.name }} </a>
+  {% endfor %}
+  {% else %}
+  <h3> Your list is empty!</h3>
+  {% endif %}
+  <hr>
+  <div id="map"></div>
+
+
+</div>
+
+{% endblock %}
+
+{% block content2 %}
+<script>
+  // Initialize and add the map
+  function initMap() {
+    // The location of Uluru
+    var location = {
+      lat: {{ coors[0] }},
+      lng: {{ coors[1] }}
+    };
+    // The map, centered at Uluru
+    var map = new google.maps.Map(
+      document.getElementById('map'), {
+        zoom: 4,
+        center: location
+      });
+    // The marker, positioned at Uluru
+    var marker = new google.maps.Marker({
+      position: location,
+      map: map
+    });
+  }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDIJaj7bbDWpnlzaATnmuupdqyR_l5WhVw&callback=initMap">
+</script>
+{% endblock%}

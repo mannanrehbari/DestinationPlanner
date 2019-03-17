@@ -1,0 +1,25 @@
+{% extends "base.html"%}
+{% block title %} Index {% endblock %}
+{% block head %}
+{{ super() }}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <h4> Confirm to delete country</h4>
+  <div class="jumbotron">
+    <h1> <strong>{{country.name}} </strong> </h1>
+
+    <form class="form-inline" , method='post'>
+      <button class="btn btn-danger" type="submit"> Remove </button>
+      <a class="btn btn-info" href="{{url_for('viewcountry', countryid=country.id)}}" role="button"> Go Back </a>
+
+    </form>
+
+  </div>
+
+</div>
+
+{% endblock %}

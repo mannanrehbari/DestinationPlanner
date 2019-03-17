@@ -1,0 +1,64 @@
+{% extends "base.html"%}
+{% block title %} Index {% endblock %}
+{% block head %}
+{{ super() }}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <!-- gets the flashed message to create a dismissible alert-->
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+  {% endwith %}
+
+  <h1> {{dest.name}}</h1>
+  <br>
+  {% if dest.destdescription == "" %}
+  <div class="btn-group btn-group-justified">
+    <a href="{{url_for('adddescription', countryid=country.id, destid=dest.id)}}" class="btn btn-info">Add a description </a>
+    <a class="btn btn-info" href="{{url_for('viewcountry', countryid=country.id)}}" role="button"> Go Back </a>
+    <a href="{{url_for('deletedestination', countryid=country.id, destid=dest.id)}}" class="btn btn-warning">Remove destination</a>
+  </div>
+  {% else %}
+
+
+
+    <a class="btn btn-info" href="{{url_for('modifydescription', countryid=country.id, destid=dest.id)}}" role="button"> Modify description </a>
+    <div class="well well-lg" >
+      {{dest.destdescription}}
+    </div>
+
+  <div class="btn-group btn-group-justified">
+    <a class="btn btn-info" href="{{url_for('viewcountry', countryid=country.id)}}" role="button"> Go Back </a>
+    <a href="{{url_for('deletedestination', countryid=country.id, destid=dest.id)}}" class="btn btn-warning">Remove destination</a>
+  </div>
+  <br>
+  <br>
+
+
+
+
+  {% endif %}
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+{% endblock%}
