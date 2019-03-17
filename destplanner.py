@@ -3,7 +3,7 @@ from flask import url_for, flash, Response, make_response
 
 from flask import session
 import random, string
-
+import os
 import json
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -424,5 +424,5 @@ def modifydescription(countryid, destid):
         return render_template('modifydescription.html', countryid=countryid, dest=dest)
 
 if __name__ == '__main__':
-    app.debug=True
-    app.run(host='0.0.0.0', port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
