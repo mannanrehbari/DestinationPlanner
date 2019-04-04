@@ -48,14 +48,17 @@ class DestSpot(Base):
     user = relationship(User)
 
 
-
     @property
     def serialize(self):
         """ return destination object in serializeable format"""
         return {
             'name': self.name,
             'id' : self.id,
-            'maplocation': self.maplocation
+            'lat': self.destlat,
+            'lng': self.destlng,
+            'description': self.destdescription,
+            'country_id': self.country_id,
+            'user_id': self.user_id
         }
 
 

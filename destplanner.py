@@ -6,6 +6,7 @@ import random, string
 import os
 import json
 from sqlalchemy import create_engine
+from sqlalchemy import distinct
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.exc import MultipleResultsFound
@@ -21,6 +22,7 @@ geocoder_key = "AIzaSyDIJaj7bbDWpnlzaATnmuupdqyR_l5WhVw"
 import geocoder
 
 app= Flask(__name__)
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 app.secret_key = "UV9lQOnAJFVwy6td5r6tOcFF"
 with open('client_secret.json') as json_file:
     data= json.load(json_file)
@@ -50,8 +52,112 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 dbsession = DBSession()
 
-# for google maps marker
-# gmaps_key = googlemaps.Client(key = "AIzaSyDIJaj7bbDWpnlzaATnmuupdqyR_l5WhVw")
+# for API Endpoints for destinations
+# call the method to view specific destination
+@app.route('/apidestinations', methods=['GET', 'POST'])
+def apiDestFunction():
+    '''
+    for get and post methods
+    '''
+    if 'google_token' not in session:
+        message = 'Login to access the resource'
+        flash(message)
+        return redirect(url_for('index'))
+
+    me = google.get('userinfo')
+    userdata = me.data
+    user_id = getUserId(userdata["email"])
+    if request.method == 'GET':
+        return apiGetAllDestinations(user_id)
+    if request.method == 'POST':
+        name = request.args.get('name', '')
+        description = request.args.get('description', '')
+        return apiMakeDestination(user_id, name, description)
+
+@app.route("/apidestinations/<int:id>", methods=['GET', 'PUT', 'DELETE'])
+def destFunction(id):
+    '''
+    check method and call relevant function
+    '''
+    if 'google_token' not in session:
+        message = 'Login to access the resource'
+        flash(message)
+        return redirect(url_for('index'))
+    me = google.get('userinfo')
+    userdata = me.data
+    user_id = getUserId(userdata["email"])
+    if request.method=='GET':
+        return apiGetDestination(user_id, id)
+    elif request.method == 'PUT':
+        name = request.args.get('name', '')
+        description = request.args.get('description', '')
+        return apiUpdateDestination(user_id, id, name, description)
+    elif request.method == 'DELETE':
+        return apiDeleteDestination(user_id, id)
+
+def apiGetAllDestinations(user_id):
+    '''
+    return all destinations as JSON
+    '''
+    try:
+        dests = dbsession.query(DestSpot).filter_by(user_id=user_id).all()
+        return jsonify(Dests=[i.serialize for i in dests])
+    except NoResultFound:
+        message = {'Status': 'No Results Found'}
+        return jsonify(message)
+
+def apiGetDestination(user_id, id):
+    '''
+    returns one destination with an id
+    '''
+    try:
+        destination= dbsession.query(DestSpot).filter_by(id=id, user_id=user_id).one()
+        return jsonify(destination = destination.serialize)
+    except NoResultFound:
+        message = {'Status': 'No Results Found'}
+        return jsonify(message)
+
+def apiMakeDestination(user_id, name, description):
+    '''
+    make a new destination through api call
+    '''
+    try:
+        dest = DestSpot(user_id= user_id, name=name, destdescription=description)
+        dbsession.add(dest)
+        dbsession.commit()
+        return jsonify(Puppy=dest.serialize)
+    except NoResultFound:
+        message = {'Status': 'No Results Found'}
+        return jsonify(message)
+
+def apiUpdateDestination(user_id, id, name, description):
+    '''
+    update a destination with given info
+    '''
+    try:
+        dest = dbsession.query(DestSpot).filter_by(user_id = user_id, id=id).one()
+        dest.destdescription = description
+        dbsession.add(dest)
+        dbsession.commit()
+        return "Updated a dest with id %s "%id
+    except NoResultFound:
+        message = {'Status': 'No Results Found'}
+        return jsonify(message)
+
+def apiDeleteDestination(user_id, id):
+    '''
+    delete a destination through api call
+    '''
+    try:
+        dest = dbsession.query(DestSpot).filter_by(user_id = user_id, id=id).one()
+        dbsession.delete(dest)
+        dbsession.commit()
+        return "removed a dest with id %s "% id
+    except NoResultFound:
+        message = {'Status': 'No Results Found'}
+        return jsonify(message)
+
+# ********end API functionality ********#
 
 def createUser(userdata):
     '''
@@ -80,7 +186,6 @@ def getUserId(email):
     except:
         return None
 
-
 @app.route('/')
 @app.route('/index')
 def index():
@@ -89,12 +194,13 @@ def index():
     userdata object will be a python dictionary
     If not logged in: render public page
     '''
+    destinations = dbsession.query(Country).distinct(Country.name).group_by(Country.name).limit(5)
     if 'google_token' in session:
         me = google.get('userinfo') # returns a oauthlib object
         userdata = me.data # we just need the data from me object
-        return render_template('home.html', userdata=userdata)
+        return render_template('home.html', userdata=userdata, destinations=destinations)
     else:
-        return render_template('pubhome.html')
+        return render_template('pubhome.html',  destinations=destinations)
 
 @app.route('/login')
 def login():
