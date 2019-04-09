@@ -26,6 +26,7 @@
   <div class="btn-group btn-group-justified">
     <a href="{{url_for('adddescription', countryid=country.id, destid=dest.id)}}" class="btn btn-info">Add a description </a>
     <a class="btn btn-info" href="{{url_for('viewcountry', countryid=country.id)}}" role="button"> Go Back </a>
+    <a class="btn btn-info" href="{{url_for('modifyspot', countryid=country.id, destid=dest.id)}}" role="button"> Edit name </a>
     <a href="{{url_for('deletedestination', countryid=country.id, destid=dest.id)}}" class="btn btn-warning">Remove destination</a>
   </div>
   {% else %}
@@ -39,6 +40,7 @@
 
   <div class="btn-group btn-group-justified">
     <a class="btn btn-info" href="{{url_for('viewcountry', countryid=country.id)}}" role="button"> Go Back </a>
+    <a class="btn btn-info" href="{{url_for('modifyspot', countryid=country.id, destid=dest.id)}}" role="button"> Edit name </a>
     <a href="{{url_for('deletedestination', countryid=country.id, destid=dest.id)}}" class="btn btn-warning">Remove destination</a>
   </div>
   <br>
