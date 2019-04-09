@@ -7,6 +7,8 @@ The application is based on the following Python(3.7.1) packages:
 - Flask==1.0.2
 - Flask_OAuthlib==0.9.5
 - geocoder==1.38.1
+
+
 To install the above, use `pip install <package>`. Or using the provided reqs file: `pip install -r requirements.txt`.
 
 - Bootstrap 3.4.0 [CDN](https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js)
