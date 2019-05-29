@@ -18,7 +18,7 @@ To install the above, use `pip install <package>`. Or using the provided reqs fi
 
 ## Run the app
 There are two ways to run this full-stack application.
-1. Check this [heroku](http://destinationplanner.herokuapp.com/) application!
+1. Check this [heroku](https://destinationplanner.herokuapp.com/) application!
 2. Follow these steps:
    - Clone this [repository](https://github.com/mannanrehbari/DestinationPlanner).
    - Install the requirements mentioned above.
@@ -27,7 +27,7 @@ There are two ways to run this full-stack application.
 
 
 ## Demonstration
-See this  [heroku](http://destinationplanner.herokuapp.com/) application!
+See this  [heroku](https://destinationplanner.herokuapp.com/) application!
 
 ## License
 See [license](LICENSE)
